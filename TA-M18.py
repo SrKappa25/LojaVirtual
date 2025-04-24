@@ -46,26 +46,31 @@ class LojaVirtual:
             
             print(f"\n{quantidade} {self.produtos[id_produto]['nome']} adicionado ao carrinho!")
 
-        except:
-            print("\nDigite apenas o ID do produto")
+        except ValueError:
+            print("\nDigite apenas o ID do produto e quantidade como números válidos")
+        except ProdutoInexistenteError as e:
+            print(f"\nErro: {e}")
+        except Exception as e:
+            print(f"\nErro inesperado: {e}")
     
     def exibir_carrinho(self):
         if not self.carrinho:
             print("\nO seu carrinho está vazio.")
             return 0
 
-        total = 0
+        total_geral = 0
         print("\nO Seu Carrinho")
         
         for id_produto, quantidade in self.carrinho.items():
             nome = self.produtos[id_produto]["nome"]
             preco = self.produtos[id_produto]["preco"]
-            total = preco * quantidade
+            subtotal = preco * quantidade
+            total_geral += subtotal
             
-            print(f"{nome} - {quantidade} {preco:.2f}€ = {total:.2f}€")
+            print(f"{nome} - {quantidade} x {preco:.2f}€ = {subtotal:.2f}€")
         
-        print(f"\nTotal: {total:.2f}€")
-        return total
+        print(f"\nTotal: {total_geral:.2f}€")
+        return total_geral
     
     def efetuar_pagamento(self):
         try:
@@ -87,8 +92,12 @@ class LojaVirtual:
                 self.carrinho = {}
             else:
                 print("\nOperação cancelada.")    
-        except:
-            print("\nErro")
+        except CarrinhoVazioError as e:
+            print(f"\nErro: {e}")
+        except SaldoInsuficienteError as e:
+            print(f"\nErro: {e}")
+        except Exception as e:
+            print(f"\nErro inesperado: {e}")
     
     def menu_principal(self):
         opcoes = {
@@ -117,8 +126,10 @@ class LojaVirtual:
                 
                 if opcoes[escolha][1] is not None:
                     opcoes[escolha][1]()
-            except:
+            except ValueError:
                 print("\nDigite apenas números para selecionar uma opção.")
+            except Exception as e:
+                print(f"\nErro inesperado: {e}")
               
 def main():
     print("Loja Virtual")
@@ -128,5 +139,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except:
-        print("\n\nPrograma encerrado.")
+    except KeyboardInterrupt:
+        print("\n\nPrograma encerrado pelo usuário.")
+    except Exception as e:
+        print(f"\n\nPrograma encerrado. Erro: {e}")
